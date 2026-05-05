@@ -3,9 +3,11 @@ const mongoose = require("mongoose");
 const parkingLogSchema = new mongoose.Schema(
   {
     cardId: { type: String, required: true },
-    ownerName: { type: String, required: true },
-    carNumber: { type: String, required: true },
-    carType: { type: String, required: true },
+    clientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Client",
+      required: true,
+    },
     slotNumber: { type: Number, required: true },
     entryTime: { type: Date, required: true },
     exitTime: { type: Date, default: null },
