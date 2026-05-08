@@ -1,8 +1,14 @@
 const express = require("express");
-const cors = require("cors");
 const dotenv = require("dotenv");
+const cors = require("cors");
 const mongoose = require("mongoose");
-const connectDB = require("./config/database");
+const connectDB = require("./src/config/database");
+const errorHandler = require("./src/middleware/errorHandler");
+
+const authRoutes = require("./src/routes/authRoutes");
+const clientRoutes = require("./src/routes/clientRoutes");
+const cardRoutes = require("./src/routes/cardRoutes");
+const parkingRoutes = require("./src/routes/parkingRoutes");
 
 dotenv.config();
 connectDB();
@@ -19,6 +25,11 @@ app.get("/health", async (req, res) => {
     database: state === 1 ? "connected" : "disconnected",
   });
 });
+
+app.use("/api/auth", authRoutes);
+app.use("/api/clients", clientRoutes);
+app.use("/api/cards", cardRoutes);
+app.use("/api/parking", parkingRoutes);
 
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
