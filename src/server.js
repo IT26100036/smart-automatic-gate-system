@@ -2,13 +2,13 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const mongoose = require("mongoose");
-const connectDB = require("./src/config/database");
-const errorHandler = require("./src/middleware/errorHandler");
+const connectDB = require("./config/database");
+const errorHandler = require("./middleware/errorHandler");
 
-const authRoutes = require("./src/routes/authRoutes");
-const clientRoutes = require("./src/routes/clientRoutes");
-const cardRoutes = require("./src/routes/cardRoutes");
-const parkingRoutes = require("./src/routes/parkingRoutes");
+const authRoutes = require("./routes/authRoutes");
+const clientRoutes = require("./routes/clientRoutes");
+const cardRoutes = require("./routes/cardRoutes");
+const parkingRoutes = require("./routes/parkingRoutes");
 
 dotenv.config();
 connectDB();
