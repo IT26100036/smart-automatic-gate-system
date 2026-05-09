@@ -42,6 +42,7 @@ project-root/
 │   │   └── parkingRoutes.js
 │   └── server.js
 ├── .env
+├── .env.example
 ├── .gitignore
 ├── package.json
 └── README.md
