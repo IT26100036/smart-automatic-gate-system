@@ -31,6 +31,8 @@ app.use("/api/clients", clientRoutes);
 app.use("/api/cards", cardRoutes);
 app.use("/api/parking", parkingRoutes);
 
+app.use(errorHandler);
+
 app.listen(process.env.PORT, () => {
   console.log(`Server running on port ${process.env.PORT}`);
 });
