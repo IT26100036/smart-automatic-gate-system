@@ -4,6 +4,11 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const connectDB = require("./config/database");
 const errorHandler = require("./middleware/errorHandler");
+const {
+  globalLimiter,
+  authLimiter,
+  esp32Limiter,
+} = require("./middleware/rateLimiter");
 
 const authRoutes = require("./routes/authRoutes");
 const clientRoutes = require("./routes/clientRoutes");
@@ -16,6 +21,7 @@ connectDB();
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(globalLimiter);
 
 app.get("/", (req, res) => res.send("Smart Gate API Running"));
 app.get("/health", async (req, res) => {
@@ -26,10 +32,12 @@ app.get("/health", async (req, res) => {
   });
 });
 
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/cards", cardRoutes);
 app.use("/api/parking", parkingRoutes);
+app.use("/api/parking/entry", esp32Limiter);
+app.use("/api/parking/exit", esp32Limiter);
 
 app.use(errorHandler);
 
