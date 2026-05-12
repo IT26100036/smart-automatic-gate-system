@@ -22,6 +22,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(globalLimiter);
+app.set('trust proxy', 1);
 
 app.get("/", (req, res) => res.send("Smart Gate API Running"));
 app.get("/health", async (req, res) => {
