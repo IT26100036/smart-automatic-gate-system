@@ -30,15 +30,22 @@ const handleEntry = async (req, res) => {
       return res.status(403).json({ message: "Insufficient balance" });
     }
 
-    const availableSlot = await ParkingSlot.findOne({ isOccupied: false });
+    const alreadyParked = await ParkingSlot.findOne({ cardId });
+    if (alreadyParked) {
+      return res
+        .status(400)
+        .json({ message: "Card already has an active slot" });
+    }
+
+    const availableSlot = await ParkingSlot.findOneAndUpdate(
+      { isOccupied: false },
+      { isOccupied: true, cardId, carNumber: card.clientId.carNumber },
+      { new: true },
+    );
+
     if (!availableSlot) {
       return res.status(400).json({ message: "No available slots" });
     }
-
-    availableSlot.isOccupied = true;
-    availableSlot.cardId = cardId;
-    availableSlot.carNumber = card.clientId.carNumber;
-    await availableSlot.save();
 
     const log = await ParkingLog.create({
       cardId,
