@@ -37,8 +37,6 @@ app.use("/api/auth", authLimiter, authRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/cards", cardRoutes);
 app.use("/api/parking", parkingRoutes);
-app.use("/api/parking/entry", esp32Limiter);
-app.use("/api/parking/exit", esp32Limiter);
 
 app.use(errorHandler);
 
