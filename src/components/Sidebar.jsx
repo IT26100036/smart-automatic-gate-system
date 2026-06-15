@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import {
   Drawer, Box, List, ListItem, ListItemButton,
-  ListItemIcon, ListItemText, Typography, Divider, Tooltip,
+  ListItemIcon, ListItemText, Typography, Divider,
 } from '@mui/material';
 import LocalParkingIcon from '@mui/icons-material/LocalParking';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -11,19 +11,29 @@ import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import PeopleIcon from '@mui/icons-material/People';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import SettingsIcon from '@mui/icons-material/Settings';
+import LogoutIcon from '@mui/icons-material/Logout';
 import { useAuth } from '../context/AuthContext';
 
-const nav = [
-  { label: 'Dashboard',  to: '/dashboard',  Icon: DashboardIcon },
-  { label: 'Slots',      to: '/slots',      Icon: ViewModuleIcon },
-  { label: 'Analytics',  to: '/analytics',  Icon: BarChartIcon },
-  { label: 'Logs',       to: '/logs',       Icon: ReceiptLongIcon },
-  { label: 'Clients',    to: '/clients',    Icon: PeopleIcon },
-  { label: 'Cards',      to: '/cards',      Icon: CreditCardIcon },
+const NAV_ITEMS = [
+  { label: 'Dashboard', to: '/dashboard', Icon: DashboardIcon },
+  { label: 'Slots',     to: '/slots',     Icon: ViewModuleIcon },
+  { label: 'Analytics', to: '/analytics', Icon: BarChartIcon },
+  { label: 'Logs',      to: '/logs',      Icon: ReceiptLongIcon },
+  { label: 'Clients',   to: '/clients',   Icon: PeopleIcon },
+  { label: 'Cards',     to: '/cards',     Icon: CreditCardIcon },
 ];
 
+const activeSx = {
+  borderRadius: 2,
+  '&.active': {
+    bgcolor: 'rgba(249,115,22,0.12)',
+    color: 'primary.main',
+    '& .MuiListItemIcon-root': { color: 'primary.main' },
+  },
+};
+
 export default function Sidebar({ width }) {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   return (
     <Drawer
@@ -34,7 +44,8 @@ export default function Sidebar({ width }) {
         '& .MuiDrawer-paper': {
           width,
           boxSizing: 'border-box',
-          bgcolor: 'background.paper',
+          display: 'flex',
+          flexDirection: 'column',
           borderRight: '1px solid',
           borderColor: 'divider',
         },
@@ -44,40 +55,33 @@ export default function Sidebar({ width }) {
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 2.5, py: 2.5 }}>
         <Box
           sx={{
-            width: 32, height: 32, borderRadius: 1.5,
+            width: 34, height: 34, borderRadius: 1.5,
             bgcolor: 'primary.main',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
           }}
         >
           <LocalParkingIcon sx={{ color: '#fff', fontSize: 20 }} />
         </Box>
-        <Typography variant="subtitle1" fontWeight={700} color="primary">
+        <Typography variant="subtitle1" fontWeight={800} color="primary" letterSpacing={-0.3}>
           ParkAdmin
         </Typography>
       </Box>
 
       <Divider />
 
-      {/* Nav links */}
-      <List sx={{ px: 1, pt: 1, flexGrow: 1 }}>
-        {nav.map(({ label, to, Icon }) => (
+      {/* Main nav */}
+      <List sx={{ px: 1, pt: 1.5, flexGrow: 1 }}>
+        {NAV_ITEMS.map(({ label, to, Icon }) => (
           <ListItem key={to} disablePadding sx={{ mb: 0.5 }}>
-            <ListItemButton
-              component={NavLink}
-              to={to}
-              sx={{
-                borderRadius: 2,
-                '&.active': {
-                  bgcolor: 'rgba(249,115,22,0.12)',
-                  color: 'primary.main',
-                  '& .MuiListItemIcon-root': { color: 'primary.main' },
-                },
-              }}
-            >
+            <ListItemButton component={NavLink} to={to} sx={activeSx}>
               <ListItemIcon sx={{ minWidth: 36 }}>
                 <Icon fontSize="small" />
               </ListItemIcon>
-              <ListItemText primary={label} primaryTypographyProps={{ fontSize: 14 }} />
+              <ListItemText
+                primary={label}
+                primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+              />
             </ListItemButton>
           </ListItem>
         ))}
@@ -85,39 +89,47 @@ export default function Sidebar({ width }) {
 
       <Divider />
 
-      {/* Settings + Logout */}
-      <List sx={{ px: 1, pb: 1 }}>
+      {/* Bottom: Settings + user info + logout */}
+      <List sx={{ px: 1, py: 1 }}>
         <ListItem disablePadding sx={{ mb: 0.5 }}>
-          <ListItemButton
-            component={NavLink}
-            to="/settings"
-            sx={{
-              borderRadius: 2,
-              '&.active': {
-                bgcolor: 'rgba(249,115,22,0.12)',
-                color: 'primary.main',
-                '& .MuiListItemIcon-root': { color: 'primary.main' },
-              },
-            }}
-          >
+          <ListItemButton component={NavLink} to="/settings" sx={activeSx}>
             <ListItemIcon sx={{ minWidth: 36 }}>
               <SettingsIcon fontSize="small" />
             </ListItemIcon>
-            <ListItemText primary="Settings" primaryTypographyProps={{ fontSize: 14 }} />
+            <ListItemText
+              primary="Settings"
+              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
+            />
           </ListItemButton>
         </ListItem>
 
         <ListItem disablePadding>
-          <Tooltip title="Sign out" placement="right">
-            <ListItemButton onClick={logout} sx={{ borderRadius: 2 }}>
-              <ListItemText
-                primary="Sign out"
-                primaryTypographyProps={{ fontSize: 14, color: 'error.main' }}
-              />
-            </ListItemButton>
-          </Tooltip>
+          <ListItemButton onClick={logout} sx={{ borderRadius: 2 }}>
+            <ListItemIcon sx={{ minWidth: 36 }}>
+              <LogoutIcon fontSize="small" color="error" />
+            </ListItemIcon>
+            <ListItemText
+              primary="Sign out"
+              primaryTypographyProps={{ fontSize: 14, fontWeight: 500, color: 'error.main' }}
+            />
+          </ListItemButton>
         </ListItem>
       </List>
+
+      {/* User chip at bottom */}
+      {user && (
+        <>
+          <Divider />
+          <Box sx={{ px: 2.5, py: 1.5 }}>
+            <Typography variant="caption" color="text.secondary" display="block">
+              Signed in as
+            </Typography>
+            <Typography variant="body2" fontWeight={600} noWrap>
+              {user.email ?? user.name ?? 'Admin'}
+            </Typography>
+          </Box>
+        </>
+      )}
     </Drawer>
   );
 }
