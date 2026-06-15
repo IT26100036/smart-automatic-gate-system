@@ -7,9 +7,11 @@ const {
   createClient,
   updateClient,
   deleteClient,
+  getClientWithCard,
 } = require("../controllers/clientController");
 
 router.get("/", protect, adminOnly, getClients);
+router.get("/:id/card", protect, adminOnly, getClientWithCard);
 router.get("/:id", protect, adminOnly, getClient);
 router.post("/", protect, adminOnly, createClient);
 router.put("/:id", protect, adminOnly, updateClient);

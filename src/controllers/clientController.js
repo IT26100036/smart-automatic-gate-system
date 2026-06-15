@@ -1,4 +1,5 @@
 const Client = require("../models/Client");
+const Card = require("../models/Card");
 
 // @desc    Get all clients
 // @route   GET /api/clients
@@ -99,10 +100,26 @@ const deleteClient = async (req, res) => {
   }
 };
 
+// @desc    Get client with their card and current balance
+// @route   GET /api/clients/:id/card
+const getClientWithCard = async (req, res) => {
+  try {
+    const client = await Client.findById(req.params.id);
+    if (!client) {
+      return res.status(404).json({ message: "Client not found" });
+    }
+    const card = await Card.findOne({ clientId: client._id });
+    res.status(200).json({ ...client.toObject(), card: card || null });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getClients,
   getClient,
   createClient,
   updateClient,
   deleteClient,
+  getClientWithCard,
 };

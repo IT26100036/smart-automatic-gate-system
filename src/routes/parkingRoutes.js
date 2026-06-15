@@ -8,8 +8,10 @@ const {
   handleEntry,
   handleExit,
   getLogs,
+  getAvailableSlotCount,
 } = require("../controllers/parkingController");
 
+router.get("/slots/available-count", getAvailableSlotCount);
 router.get("/slots", protect, getSlots);
 router.put("/slots/:slotNumber/status", protect, updateSlotStatus);
 router.get("/logs", protect, adminOnly, getLogs);

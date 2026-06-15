@@ -150,10 +150,22 @@ const getLogs = async (req, res) => {
   }
 };
 
+// @desc    Get count of available (free) parking slots
+// @route   GET /api/parking/slots/available-count
+const getAvailableSlotCount = async (req, res) => {
+  try {
+    const count = await ParkingSlot.countDocuments({ isOccupied: false });
+    res.status(200).json({ availableSlots: count });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getSlots,
   updateSlotStatus,
   handleEntry,
   handleExit,
   getLogs,
+  getAvailableSlotCount,
 };
