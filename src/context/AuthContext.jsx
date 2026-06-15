@@ -4,11 +4,17 @@ import api from '../api/axios';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+  const DEV = import.meta.env.DEV;
+
   const [user, setUser] = useState(() => {
+    if (DEV) return { email: 'dev@parkadmin.local', name: 'Dev User' };
     const stored = localStorage.getItem('user');
     return stored ? JSON.parse(stored) : null;
   });
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [token, setToken] = useState(() => {
+    if (DEV) return 'dev-token';
+    return localStorage.getItem('token');
+  });
 
   async function login(email, password) {
     const { data } = await api.post('/api/auth/login', { email, password });
