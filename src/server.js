@@ -4,11 +4,8 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const connectDB = require("./config/database");
 const errorHandler = require("./middleware/errorHandler");
-const {
-  globalLimiter,
-  authLimiter,
-  esp32Limiter,
-} = require("./middleware/rateLimiter");
+const seedSlots = require("./config/seedSlots");
+const { globalLimiter, authLimiter } = require("./middleware/rateLimiter");
 
 const authRoutes = require("./routes/authRoutes");
 const clientRoutes = require("./routes/clientRoutes");
@@ -16,13 +13,13 @@ const cardRoutes = require("./routes/cardRoutes");
 const parkingRoutes = require("./routes/parkingRoutes");
 
 dotenv.config();
-connectDB();
+connectDB().then(() => seedSlots());
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(globalLimiter);
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 
 app.get("/", (req, res) => res.send("Smart Gate API Running"));
 app.get("/health", async (req, res) => {
