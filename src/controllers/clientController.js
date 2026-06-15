@@ -28,6 +28,8 @@ const getClient = async (req, res) => {
 
 // @desc    Create client
 // @route   POST /api/clients
+const CAR_NUMBER_REGEX = /^[A-Z]{2,3}-\d{4}$/;
+
 const createClient = async (req, res) => {
   try {
     const {
@@ -40,6 +42,14 @@ const createClient = async (req, res) => {
       carModel,
       carColor,
     } = req.body;
+
+    if (!name || !email || !phone || !carNumber || !carType || !carModel || !carColor) {
+      return res.status(400).json({ message: "name, email, phone, carNumber, carType, carModel, and carColor are required" });
+    }
+
+    if (!CAR_NUMBER_REGEX.test(carNumber)) {
+      return res.status(400).json({ message: "carNumber must follow the format AB-1234 or ABC-1234" });
+    }
 
     const clientExists = await Client.findOne({ email });
     if (clientExists) {
