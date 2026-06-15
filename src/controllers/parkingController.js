@@ -17,6 +17,23 @@ const getSlots = async (req, res) => {
   }
 };
 
+// @desc    Update Slot status
+// @route   POST /api/slots/:slotNumber/status
+const updateSlotStatus = async (req, res) => {
+  try {
+    const { isOccupied } = req.body;
+    const slot = await ParkingSlot.findOneAndUpdate(
+      { slotNumber: req.params.slotNumber },
+      { isOccupied },
+      { new: true },
+    );
+    if (!slot) return res.status(404).json({ message: "Slot not found" });
+    res.status(200).json(slot);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // @desc    Handle entry - triggered by ESP32 on RFID scan at entry gate
 // @route   POST /api/parking/entry
 const handleEntry = async (req, res) => {
@@ -133,4 +150,10 @@ const getLogs = async (req, res) => {
   }
 };
 
-module.exports = { getSlots, handleEntry, handleExit, getLogs };
+module.exports = {
+  getSlots,
+  updateSlotStatus,
+  handleEntry,
+  handleExit,
+  getLogs,
+};
