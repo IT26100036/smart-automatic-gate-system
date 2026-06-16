@@ -6,12 +6,8 @@ const Card = require("../models/Card");
 // @route   GET /api/parking/slots
 const getSlots = async (req, res) => {
   try {
-    const slot = await ParkingSlot.findOne({ slotNumber: log.slotNumber });
-    if (!slot) return res.status(404).json({ message: "Slot not found" });
-    slot.isOccupied = false;
-    slot.cardId = null;
-    slot.carNumber = null;
-    await slot.save();
+    const slots = await ParkingSlot.find().sort({ slotNumber: 1 });
+    res.status(200).json(slots);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
