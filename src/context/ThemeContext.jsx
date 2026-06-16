@@ -17,7 +17,7 @@ function buildTheme(mode) {
         : { background: { default: '#0f0f0f', paper: '#1a1a1a' } }),
     },
     shape: { borderRadius: 10 },
-    typography: { fontFamily: 'system-ui, "Segoe UI", Roboto, sans-serif' },
+    typography: { fontFamily: '"Geist", system-ui, sans-serif' },
     components: {
       MuiButton: {
         styleOverrides: { containedPrimary: { fontWeight: 700 } },

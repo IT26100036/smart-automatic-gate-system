@@ -1,35 +1,47 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink } from "react-router-dom";
+import { Icon } from "@iconify/react";
 import {
-  Drawer, Box, List, ListItem, ListItemButton,
-  ListItemIcon, ListItemText, Typography, Divider,
-} from '@mui/material';
-import LocalParkingIcon from '@mui/icons-material/LocalParking';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import ViewModuleIcon from '@mui/icons-material/ViewModule';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
-import PeopleIcon from '@mui/icons-material/People';
-import CreditCardIcon from '@mui/icons-material/CreditCard';
-import SettingsIcon from '@mui/icons-material/Settings';
-import LogoutIcon from '@mui/icons-material/Logout';
-import { useAuth } from '../context/AuthContext';
+  Drawer,
+  Box,
+  List,
+  ListItem,
+  ListItemButton,
+  Typography,
+  Divider,
+} from "@mui/material";
+import { useAuth } from "../context/AuthContext";
+import AccountPopover from "./AccountPopover";
 
-const NAV_ITEMS = [
-  { label: 'Dashboard', to: '/dashboard', Icon: DashboardIcon },
-  { label: 'Slots',     to: '/slots',     Icon: ViewModuleIcon },
-  { label: 'Analytics', to: '/analytics', Icon: BarChartIcon },
-  { label: 'Logs',      to: '/logs',      Icon: ReceiptLongIcon },
-  { label: 'Clients',   to: '/clients',   Icon: PeopleIcon },
-  { label: 'Cards',     to: '/cards',     Icon: CreditCardIcon },
+const NAV_SECTIONS = [
+  {
+    title: "STUDENT",
+    items: [
+      { label: "Dashboard", to: "/dashboard", icon: "solar:home-angle-bold-duotone" },
+      { label: "Slots", to: "/slots", icon: "solar:widget-bold-duotone" },
+      { label: "Analytics", to: "/analytics", icon: "solar:chart-bold-duotone" },
+    ],
+  },
+  {
+    title: "ACTIVITY",
+    items: [
+      { label: "Logs", to: "/logs", icon: "solar:history-bold-duotone" },
+      { label: "Clients", to: "/clients", icon: "solar:users-group-rounded-bold-duotone" },
+      { label: "Cards", to: "/cards", icon: "solar:card-bold-duotone" },
+    ],
+  },
+  {
+    title: "ACCOUNT",
+    items: [
+      { label: "Settings", to: "/settings", icon: "solar:settings-bold-duotone" },
+    ],
+  },
 ];
 
-const activeSx = {
-  borderRadius: 2,
-  '&.active': {
-    bgcolor: 'rgba(249,115,22,0.12)',
-    color: 'primary.main',
-    '& .MuiListItemIcon-root': { color: 'primary.main' },
-  },
+const sinhalaFont = {
+  fontFamily: "'Noto Sans Sinhala', serif !important",
+  fontVariationSettings: '"wdth" 100',
+  fontOpticalSizing: "auto",
+  fontStyle: "normal",
 };
 
 export default function Sidebar({ width }) {
@@ -41,95 +53,94 @@ export default function Sidebar({ width }) {
       sx={{
         width,
         flexShrink: 0,
-        '& .MuiDrawer-paper': {
+        "& .MuiDrawer-paper": {
           width,
-          boxSizing: 'border-box',
-          display: 'flex',
-          flexDirection: 'column',
-          borderRight: '1px solid',
-          borderColor: 'divider',
+          boxSizing: "border-box",
+          display: "flex",
+          flexDirection: "column",
+          backgroundColor: "#FFFFFF",
+          boxShadow: "2px 0 6px rgba(0,0,0,0.08)",
+          borderRight: "none",
         },
       }}
     >
       {/* Brand */}
-      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, px: 2.5, py: 2.5 }}>
-        <Box
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", px: 2.5, py: 2 }}>
+        <Typography
+          variant="h6"
+          noWrap
           sx={{
-            width: 34, height: 34, borderRadius: 1.5,
-            bgcolor: 'primary.main',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
+            color: "#f97316",
+            fontWeight: 800,
+            fontSize: 17,
+            letterSpacing: 0.5,
+            lineHeight: "1.5",
+            textTransform: "uppercase",
+            ...sinhalaFont,
           }}
         >
-          <LocalParkingIcon sx={{ color: '#fff', fontSize: 20 }} />
-        </Box>
-        <Typography variant="subtitle1" fontWeight={800} color="primary" letterSpacing={-0.3}>
-          ParkAdmin
+          Smart Gate System
         </Typography>
       </Box>
 
       <Divider />
 
-      {/* Main nav */}
-      <List sx={{ px: 1, pt: 1.5, flexGrow: 1 }}>
-        {NAV_ITEMS.map(({ label, to, Icon }) => (
-          <ListItem key={to} disablePadding sx={{ mb: 0.5 }}>
-            <ListItemButton component={NavLink} to={to} sx={activeSx}>
-              <ListItemIcon sx={{ minWidth: 36 }}>
-                <Icon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText
-                primary={label}
-                primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-
-      <Divider />
-
-      {/* Bottom: Settings + user info + logout */}
-      <List sx={{ px: 1, py: 1 }}>
-        <ListItem disablePadding sx={{ mb: 0.5 }}>
-          <ListItemButton component={NavLink} to="/settings" sx={activeSx}>
-            <ListItemIcon sx={{ minWidth: 36 }}>
-              <SettingsIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Settings"
-              primaryTypographyProps={{ fontSize: 14, fontWeight: 500 }}
-            />
-          </ListItemButton>
-        </ListItem>
-
-        <ListItem disablePadding>
-          <ListItemButton onClick={logout} sx={{ borderRadius: 2 }}>
-            <ListItemIcon sx={{ minWidth: 36 }}>
-              <LogoutIcon fontSize="small" color="error" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Sign out"
-              primaryTypographyProps={{ fontSize: 14, fontWeight: 500, color: 'error.main' }}
-            />
-          </ListItemButton>
-        </ListItem>
-      </List>
-
-      {/* User chip at bottom */}
-      {user && (
-        <>
-          <Divider />
-          <Box sx={{ px: 2.5, py: 1.5 }}>
-            <Typography variant="caption" color="text.secondary" display="block">
-              Signed in as
-            </Typography>
-            <Typography variant="body2" fontWeight={600} noWrap>
-              {user.email ?? user.name ?? 'Admin'}
-            </Typography>
+      {/* Nav sections */}
+      <Box component="nav" sx={{ flexGrow: 1, overflowY: "auto", px: 1.5, pt: 1.5 }}>
+        {NAV_SECTIONS.map((section, index) => (
+          <Box key={section.title}>
+            {index > 0 && <Divider sx={{ my: 1.5 }} />}
+            <List disablePadding>
+              {section.items.map(({ label, to, icon }) => (
+                <ListItem key={to} disablePadding sx={{ mb: 0.5 }}>
+                  <ListItemButton
+                    component={NavLink}
+                    to={to}
+                    sx={{
+                      px: 1,
+                      gap: 2,
+                      borderRadius: 0.75,
+                      color: "#637381",
+                      fontWeight: 600,
+                      "&.active": {
+                        bgcolor: "rgba(249,115,22,0.08)",
+                        color: "#f97316",
+                        "& .nav-icon": { color: "#f97316" },
+                        "&:hover": { bgcolor: "rgba(249,115,22,0.14)" },
+                      },
+                      "&:not(.active):hover": { bgcolor: "rgba(0,0,0,0.04)" },
+                    }}
+                  >
+                    <Box className="nav-icon" sx={{ width: 24, height: 24, color: "#637381", display: "flex" }}>
+                      <Icon icon={icon} width={22} />
+                    </Box>
+                    <Typography
+                      variant="body2"
+                      sx={{ fontWeight: 700, letterSpacing: 0.5, lineHeight: 1.5, ...sinhalaFont }}
+                    >
+                      {label}
+                    </Typography>
+                  </ListItemButton>
+                </ListItem>
+              ))}
+            </List>
           </Box>
-        </>
-      )}
+        ))}
+      </Box>
+
+      {/* Account */}
+      <Divider />
+      <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, px: 2, py: 1.5 }}>
+        <AccountPopover />
+        <Box sx={{ minWidth: 0 }}>
+          <Typography variant="body2" fontWeight={700} noWrap sx={{ color: "#212B36", lineHeight: 1.3, ...sinhalaFont }}>
+            Admin
+          </Typography>
+          <Typography variant="caption" noWrap sx={{ color: "#919EAB", display: "block", letterSpacing: 0.3 }}>
+            {user?.email ?? "admin@smartgate.local"}
+          </Typography>
+        </Box>
+      </Box>
     </Drawer>
   );
 }
