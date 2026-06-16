@@ -27,7 +27,7 @@ const CHART_OPTIONS = {
     legend: { display: false },
     tooltip: {
       callbacks: {
-        label: (ctx) => ` $${ctx.parsed.y.toLocaleString()}`,
+        label: (ctx) => ` LKR ${ctx.parsed.y.toLocaleString()}`,
       },
     },
   },
@@ -35,7 +35,7 @@ const CHART_OPTIONS = {
     x: { grid: { display: false } },
     y: {
       grid: { color: 'rgba(0,0,0,0.06)' },
-      ticks: { callback: (v) => `$${v}` },
+      ticks: { callback: (v) => `LKR ${v}` },
     },
   },
 };
@@ -132,17 +132,13 @@ export default function Dashboard() {
   const chartData = buildChartData(logs);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-      {/* Stat cards */}
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      {/* Stat cards — 4 in a row from md up, 2 on small */}
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6} lg={3}>
-          <StatCard
-            label="Total Slots"
-            value={total}
-            icon={<ViewModuleIcon />}
-          />
+        <Grid size={{ xs: 6, md: 3 }}>
+          <StatCard label="Total Slots" value={total} icon={<ViewModuleIcon />} />
         </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 6, md: 3 }}>
           <StatCard
             label="Occupied"
             value={occupied}
@@ -150,17 +146,13 @@ export default function Dashboard() {
             icon={<DirectionsCarIcon />}
           />
         </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
-          <StatCard
-            label="Available"
-            value={free}
-            icon={<CheckCircleIcon />}
-          />
+        <Grid size={{ xs: 6, md: 3 }}>
+          <StatCard label="Available" value={free} icon={<CheckCircleIcon />} />
         </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 6, md: 3 }}>
           <StatCard
             label="Today's Revenue"
-            value={`$${todayRevenue.toLocaleString()}`}
+            value={`LKR ${todayRevenue.toLocaleString()}`}
             icon={<AttachMoneyIcon />}
           />
         </Grid>
@@ -174,18 +166,18 @@ export default function Dashboard() {
 
       {/* Chart + Activity feed */}
       <Grid container spacing={3}>
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }} sx={{ display: 'flex', flexDirection: 'column' }}>
           <SectionTitle>Revenue — Last 7 Days</SectionTitle>
-          <Card variant="outlined">
+          <Card variant="outlined" sx={{ flex: 1 }}>
             <CardContent sx={{ height: 280, pt: 3 }}>
               <Bar data={chartData} options={CHART_OPTIONS} />
             </CardContent>
           </Card>
         </Grid>
 
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }} sx={{ display: 'flex', flexDirection: 'column' }}>
           <SectionTitle>Recent Activity</SectionTitle>
-          <Card variant="outlined">
+          <Card variant="outlined" sx={{ flex: 1 }}>
             <CardContent sx={{ maxHeight: 320, overflowY: 'auto' }}>
               <ActivityFeed logs={recentLogs} />
             </CardContent>

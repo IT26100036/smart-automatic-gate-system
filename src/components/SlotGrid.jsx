@@ -78,7 +78,7 @@ export default function SlotGrid({ slots = [] }) {
   return (
     <Grid container spacing={2}>
       {slots.map((slot) => (
-        <Grid item xs={12} sm={6} md={4} lg={3} key={slot.id}>
+        <Grid key={slot.id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }}>
           <SlotCard slot={slot} />
         </Grid>
       ))}

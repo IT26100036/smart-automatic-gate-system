@@ -265,28 +265,28 @@ export default function Analytics() {
 
       {/* Stat cards */}
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 6, md: 3 }}>
           <StatCard
             label="Total Revenue"
             value={`Rs. ${stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
             icon={<AttachMoneyIcon />}
           />
         </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 6, md: 3 }}>
           <StatCard
             label="Total Entries"
             value={stats.totalEntries.toLocaleString()}
             icon={<DirectionsCarIcon />}
           />
         </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 6, md: 3 }}>
           <StatCard
             label="Avg Duration"
             value={formatMins(stats.avgDuration)}
             icon={<TimerIcon />}
           />
         </Grid>
-        <Grid item xs={12} sm={6} lg={3}>
+        <Grid size={{ xs: 6, md: 3 }}>
           <StatCard
             label="Avg Revenue / Visit"
             value={`Rs. ${stats.avgRevenue.toFixed(2)}`}
@@ -297,7 +297,7 @@ export default function Analytics() {
 
       {/* Line + Bar charts */}
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Section title="Daily Revenue (Rs.)">
             <Line
               data={dailyRevenue}
@@ -311,7 +311,7 @@ export default function Analytics() {
             />
           </Section>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Section title="Daily Entries">
             <Bar data={dailyEntries} options={baseBar} />
           </Section>
@@ -334,12 +334,12 @@ export default function Analytics() {
 
       {/* Doughnuts */}
       <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Section title="Slot Utilisation" height={220}>
             <Doughnut data={slotUtil} options={baseDoughnut} />
           </Section>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid size={{ xs: 12, sm: 6 }}>
           <Section title="Car Type Split" height={220}>
             <Doughnut data={carTypeSplit} options={baseDoughnut} />
           </Section>

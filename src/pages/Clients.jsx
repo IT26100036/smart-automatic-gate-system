@@ -86,22 +86,22 @@ function ClientModal({ open, onClose, onSaved, initial }) {
 
           <Typography variant="overline" color="text.secondary">Personal Info</Typography>
           <Grid container spacing={2} sx={{ mb: 2, mt: 0 }}>
-            <Grid item xs={6}>
+            <Grid size={{ xs: 6 }}>
               <TextField label="First Name" value={form.firstName} onChange={set('firstName')} required fullWidth size="small" />
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={{ xs: 6 }}>
               <TextField label="Last Name" value={form.lastName} onChange={set('lastName')} required fullWidth size="small" />
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={{ xs: 6 }}>
               <TextField label="Email" type="email" value={form.email} onChange={set('email')} required fullWidth size="small" />
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={{ xs: 6 }}>
               <TextField label="Phone" value={form.phone} onChange={set('phone')} required fullWidth size="small" />
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={{ xs: 6 }}>
               <TextField label="NIC" value={form.nic} onChange={set('nic')} fullWidth size="small" />
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={{ xs: 6 }}>
               <TextField
                 select label="Status" value={form.status} onChange={set('status')} fullWidth size="small"
               >
@@ -110,17 +110,17 @@ function ClientModal({ open, onClose, onSaved, initial }) {
                 ))}
               </TextField>
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField label="Address" value={form.address} onChange={set('address')} fullWidth size="small" multiline rows={2} />
             </Grid>
           </Grid>
 
           <Typography variant="overline" color="text.secondary">Vehicle Info</Typography>
           <Grid container spacing={2} sx={{ mt: 0 }}>
-            <Grid item xs={6}>
+            <Grid size={{ xs: 6 }}>
               <TextField label="Vehicle Number" value={form.vehicleNumber} onChange={set('vehicleNumber')} required fullWidth size="small" />
             </Grid>
-            <Grid item xs={6}>
+            <Grid size={{ xs: 6 }}>
               <TextField
                 select label="Vehicle Type" value={form.vehicleType} onChange={set('vehicleType')} fullWidth size="small"
               >
@@ -129,16 +129,16 @@ function ClientModal({ open, onClose, onSaved, initial }) {
                 ))}
               </TextField>
             </Grid>
-            <Grid item xs={4}>
+            <Grid size={{ xs: 4 }}>
               <TextField label="Make" value={form.vehicleMake} onChange={set('vehicleMake')} fullWidth size="small" placeholder="e.g. Toyota" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid size={{ xs: 4 }}>
               <TextField label="Model" value={form.vehicleModel} onChange={set('vehicleModel')} fullWidth size="small" placeholder="e.g. Corolla" />
             </Grid>
-            <Grid item xs={4}>
+            <Grid size={{ xs: 4 }}>
               <TextField label="Color" value={form.vehicleColor} onChange={set('vehicleColor')} fullWidth size="small" />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <TextField label="Notes" value={form.notes} onChange={set('notes')} fullWidth size="small" multiline rows={2} placeholder="Optional notes…" />
             </Grid>
           </Grid>
