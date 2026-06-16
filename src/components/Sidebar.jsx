@@ -45,7 +45,7 @@ const sinhalaFont = {
 };
 
 export default function Sidebar({ width }) {
-  const { logout, user } = useAuth();
+  const { user } = useAuth();
 
   return (
     <Drawer
@@ -58,19 +58,20 @@ export default function Sidebar({ width }) {
           boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
-          backgroundColor: "#FFFFFF",
+          bgcolor: "background.paper",
           boxShadow: "2px 0 6px rgba(0,0,0,0.08)",
-          borderRight: "none",
+          borderRight: "1px solid",
+          borderColor: "divider",
         },
       }}
     >
       {/* Brand */}
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", px: 2.5, py: 2 }}>
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", px: 2.5, minHeight: 64 }}>
         <Typography
           variant="h6"
           noWrap
           sx={{
-            color: "#f97316",
+            color: "primary.main",
             fontWeight: 800,
             fontSize: 17,
             letterSpacing: 0.5,
@@ -100,18 +101,18 @@ export default function Sidebar({ width }) {
                       px: 1,
                       gap: 2,
                       borderRadius: 0.75,
-                      color: "#637381",
+                      color: "text.secondary",
                       fontWeight: 600,
                       "&.active": {
                         bgcolor: "rgba(249,115,22,0.08)",
-                        color: "#f97316",
+                        color: "primary.main",
                         "& .nav-icon": { color: "#f97316" },
                         "&:hover": { bgcolor: "rgba(249,115,22,0.14)" },
                       },
-                      "&:not(.active):hover": { bgcolor: "rgba(0,0,0,0.04)" },
+                      "&:not(.active):hover": { bgcolor: "action.hover" },
                     }}
                   >
-                    <Box className="nav-icon" sx={{ width: 24, height: 24, color: "#637381", display: "flex" }}>
+                    <Box className="nav-icon" sx={{ width: 24, height: 24, color: "text.disabled", display: "flex" }}>
                       <Icon icon={icon} width={22} />
                     </Box>
                     <Typography
@@ -133,10 +134,10 @@ export default function Sidebar({ width }) {
       <Box sx={{ display: "flex", alignItems: "center", gap: 1.5, px: 2, py: 1.5 }}>
         <AccountPopover />
         <Box sx={{ minWidth: 0 }}>
-          <Typography variant="body2" fontWeight={700} noWrap sx={{ color: "#212B36", lineHeight: 1.3, ...sinhalaFont }}>
+          <Typography variant="body2" fontWeight={700} noWrap sx={{ color: "text.primary", lineHeight: 1.3, ...sinhalaFont }}>
             Admin
           </Typography>
-          <Typography variant="caption" noWrap sx={{ color: "#919EAB", display: "block", letterSpacing: 0.3 }}>
+          <Typography variant="caption" noWrap sx={{ color: "text.disabled", display: "block", letterSpacing: 0.3 }}>
             {user?.email ?? "admin@smartgate.local"}
           </Typography>
         </Box>
