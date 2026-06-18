@@ -54,7 +54,7 @@ function deriveStats(slots, logs) {
   const free = total - occupied;
   const todayRevenue = logs
     .filter((l) => {
-      const d = new Date(l.time);
+      const d = new Date(l.entryTime);
       const now = new Date();
       return (
         d.getFullYear() === now.getFullYear() &&
@@ -62,7 +62,7 @@ function deriveStats(slots, logs) {
         d.getDate() === now.getDate()
       );
     })
-    .reduce((sum, l) => sum + (l.fee ?? 0), 0);
+    .reduce((sum, l) => sum + (l.amountCharged ?? 0), 0);
 
   return { total, occupied, free, todayRevenue };
 }
@@ -81,14 +81,14 @@ function buildChartData(logs) {
   const data = days.map((day) =>
     logs
       .filter((l) => {
-        const d = new Date(l.time);
+        const d = new Date(l.entryTime);
         return (
           d.getFullYear() === day.getFullYear() &&
           d.getMonth() === day.getMonth() &&
           d.getDate() === day.getDate()
         );
       })
-      .reduce((sum, l) => sum + (l.fee ?? 0), 0)
+      .reduce((sum, l) => sum + (l.amountCharged ?? 0), 0)
   );
 
   return {
@@ -128,7 +128,7 @@ export default function Dashboard() {
   }
 
   const { total, occupied, free, todayRevenue } = deriveStats(slots, logs);
-  const recentLogs = [...logs].sort((a, b) => new Date(b.time) - new Date(a.time)).slice(0, 10);
+  const recentLogs = [...logs].sort((a, b) => new Date(b.entryTime) - new Date(a.entryTime)).slice(0, 10);
   const chartData = buildChartData(logs);
 
   return (

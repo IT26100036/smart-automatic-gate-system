@@ -14,7 +14,7 @@ import AccountPopover from "./AccountPopover";
 
 const NAV_SECTIONS = [
   {
-    title: "STUDENT",
+    title: "OVERVIEW",
     items: [
       { label: "Dashboard", to: "/dashboard", icon: "solar:home-angle-bold-duotone" },
       { label: "Slots", to: "/slots", icon: "solar:widget-bold-duotone" },

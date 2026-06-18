@@ -38,7 +38,7 @@ function TopUpModal({ open, onClose, card, onSaved }) {
     setSaving(true);
     try {
       const { data } = await api.put(`/api/cards/${card.cardId}/topup`, { amount: value });
-      onSaved(data);
+      onSaved(data, card.cardId);
       onClose();
     } catch (err) {
       setError(err.response?.data?.message || 'Top-up failed.');
@@ -104,8 +104,8 @@ function DeactivateDialog({ open, onClose, card, onConfirmed }) {
   async function handleConfirm() {
     setLoading(true);
     try {
-      const { data } = await api.put(`/api/cards/${card.cardId}/deactivate`);
-      onConfirmed(data);
+      await api.put(`/api/cards/${card.cardId}/deactivate`);
+      onConfirmed(card.cardId);
       onClose();
     } catch (err) {
       setError(err.response?.data?.message || 'Deactivation failed.');
@@ -162,19 +162,19 @@ export default function Cards() {
     const q = search.trim().toLowerCase();
     if (!q) return cards;
     return cards.filter((c) =>
-      [c.cardId, c.ownerName, c.ownerEmail, c.vehicleNumber]
+      [c.cardId, c.clientId?.name, c.clientId?.email, c.clientId?.carNumber]
         .some((v) => String(v ?? '').toLowerCase().includes(q))
     );
   }, [cards, search]);
 
   const paginated = filtered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-  function handleTopUpSaved(updated) {
-    setCards((prev) => prev.map((c) => (c.cardId === updated.cardId ? updated : c)));
+  function handleTopUpSaved({ balance }, cardId) {
+    setCards((prev) => prev.map((c) => (c.cardId === cardId ? { ...c, balance } : c)));
   }
 
-  function handleDeactivated(updated) {
-    setCards((prev) => prev.map((c) => (c.cardId === updated.cardId ? updated : c)));
+  function handleDeactivated(cardId) {
+    setCards((prev) => prev.map((c) => (c.cardId === cardId ? { ...c, isActive: false } : c)));
   }
 
   if (loading) {
@@ -193,7 +193,7 @@ export default function Cards() {
           <Typography variant="h6" fontWeight={700}>Cards</Typography>
           <Typography variant="caption" color="text.secondary">
             {filtered.length} of {cards.length} cards ·{' '}
-            {cards.filter((c) => c.status === 'active').length} active
+            {cards.filter((c) => c.isActive).length} active
           </Typography>
         </Box>
       </Box>
@@ -252,7 +252,7 @@ export default function Cards() {
                 </TableRow>
               ) : (
                 paginated.map((card, i) => {
-                  const isDeactivatable = card.status === 'active';
+                  const isDeactivatable = card.isActive === true;
                   return (
                     <TableRow key={card.cardId ?? i} hover sx={{ '&:last-child td': { border: 0 } }}>
                       <TableCell>
@@ -267,16 +267,16 @@ export default function Cards() {
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" fontWeight={600}>
-                          {card.ownerName ?? '—'}
+                          {card.clientId?.name ?? '—'}
                         </Typography>
-                        {card.ownerEmail && (
+                        {card.clientId?.email && (
                           <Typography variant="caption" color="text.secondary" display="block">
-                            {card.ownerEmail}
+                            {card.clientId.email}
                           </Typography>
                         )}
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2">{card.vehicleNumber ?? '—'}</Typography>
+                        <Typography variant="body2">{card.clientId?.carNumber ?? '—'}</Typography>
                       </TableCell>
                       <TableCell align="right">
                         <Typography
@@ -289,8 +289,8 @@ export default function Cards() {
                       </TableCell>
                       <TableCell>
                         <Chip
-                          label={card.status ?? 'unknown'}
-                          color={STATUS_COLOR[card.status] ?? 'default'}
+                          label={card.isActive ? 'active' : 'inactive'}
+                          color={card.isActive ? 'success' : 'default'}
                           size="small"
                           sx={{ fontWeight: 700, fontSize: 11, textTransform: 'capitalize' }}
                         />

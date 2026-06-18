@@ -10,12 +10,12 @@ import { useAuth } from '../context/AuthContext';
 export default function Login() {
   const { login, token } = useAuth();
   const navigate = useNavigate();
-
-  if (token) return <Navigate to="/dashboard" replace />;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  if (token) return <Navigate to="/dashboard" replace />;
 
   async function handleSubmit(e) {
     e.preventDefault();

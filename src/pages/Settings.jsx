@@ -96,11 +96,11 @@ function AccountForm() {
 
     setSaving(true);
     try {
-      await api.put('/api/auth/update', payload);
+      await api.put('/api/auth/profile', payload);
       setFeedback({ type: 'success', msg: 'Account updated successfully.' });
       setForm((f) => ({ ...f, currentPassword: '', newPassword: '', confirmPassword: '' }));
     } catch (err) {
-      setFeedback({ type: 'error', msg: err.response?.data?.message || 'Update failed.' });
+      setFeedback({ type: 'error', msg: err.response?.data?.message || 'Update failed. (Profile update endpoint not yet implemented on the backend.)' });
     } finally {
       setSaving(false);
     }

@@ -14,7 +14,7 @@ function formatTime(isoString) {
 }
 
 function EventItem({ log, showDivider }) {
-  const isEntry = log.type === 'entry';
+  const isEntry = !log.exitTime;
 
   return (
     <>
@@ -41,13 +41,13 @@ function EventItem({ log, showDivider }) {
                 {log.carNumber ?? '—'}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {formatTime(log.time)}
+                {formatTime(log.entryTime)}
               </Typography>
             </Box>
           }
           secondary={
             <Typography variant="caption" color={isEntry ? 'primary.main' : 'success.main'} fontWeight={600}>
-              {isEntry ? `Entry · Slot ${log.slot ?? '—'}` : `Exit · Slot ${log.slot ?? '—'}`}
+              {isEntry ? `Entry · Slot ${log.slotNumber ?? '—'}` : `Exit · Slot ${log.slotNumber ?? '—'}`}
             </Typography>
           }
           sx={{ my: 0 }}

@@ -13,25 +13,19 @@ import ClearIcon from '@mui/icons-material/Clear';
 import PersonIcon from '@mui/icons-material/Person';
 import api from '../api/axios';
 
-const STATUS_OPTIONS = ['active', 'inactive', 'suspended'];
-const VEHICLE_TYPES = ['Car', 'Motorcycle', 'Van', 'SUV', 'Truck', 'Other'];
+const VEHICLE_TYPES = ['sedan', 'suv', 'van', 'truck', 'motorcycle', 'other'];
 
-const STATUS_COLOR = { active: 'success', inactive: 'default', suspended: 'error' };
+const STATUS_COLOR = { true: 'success', false: 'default' };
 
 const EMPTY_FORM = {
-  firstName: '',
-  lastName: '',
+  name: '',
   email: '',
   phone: '',
-  nic: '',
   address: '',
-  vehicleNumber: '',
-  vehicleType: 'Car',
-  vehicleMake: '',
-  vehicleModel: '',
-  vehicleColor: '',
-  status: 'active',
-  notes: '',
+  carNumber: '',
+  carType: 'sedan',
+  carModel: '',
+  carColor: '',
 };
 
 function fmt(iso) {
@@ -40,7 +34,7 @@ function fmt(iso) {
 }
 
 function ClientModal({ open, onClose, onSaved, initial }) {
-  const isEdit = Boolean(initial?.id);
+  const isEdit = Boolean(initial?._id);
   const [form, setForm] = useState(EMPTY_FORM);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -60,7 +54,7 @@ function ClientModal({ open, onClose, onSaved, initial }) {
     setSaving(true);
     try {
       if (isEdit) {
-        const { data } = await api.put(`/api/clients/${initial.id}`, form);
+        const { data } = await api.put(`/api/clients/${initial._id}`, form);
         onSaved(data, 'edit');
       } else {
         const { data } = await api.post('/api/clients', form);
@@ -86,29 +80,14 @@ function ClientModal({ open, onClose, onSaved, initial }) {
 
           <Typography variant="overline" color="text.secondary">Personal Info</Typography>
           <Grid container spacing={2} sx={{ mb: 2, mt: 0 }}>
-            <Grid size={{ xs: 6 }}>
-              <TextField label="First Name" value={form.firstName} onChange={set('firstName')} required fullWidth size="small" />
-            </Grid>
-            <Grid size={{ xs: 6 }}>
-              <TextField label="Last Name" value={form.lastName} onChange={set('lastName')} required fullWidth size="small" />
+            <Grid size={{ xs: 12 }}>
+              <TextField label="Full Name" value={form.name} onChange={set('name')} required fullWidth size="small" />
             </Grid>
             <Grid size={{ xs: 6 }}>
               <TextField label="Email" type="email" value={form.email} onChange={set('email')} required fullWidth size="small" />
             </Grid>
             <Grid size={{ xs: 6 }}>
               <TextField label="Phone" value={form.phone} onChange={set('phone')} required fullWidth size="small" />
-            </Grid>
-            <Grid size={{ xs: 6 }}>
-              <TextField label="NIC" value={form.nic} onChange={set('nic')} fullWidth size="small" />
-            </Grid>
-            <Grid size={{ xs: 6 }}>
-              <TextField
-                select label="Status" value={form.status} onChange={set('status')} fullWidth size="small"
-              >
-                {STATUS_OPTIONS.map((s) => (
-                  <MenuItem key={s} value={s} sx={{ textTransform: 'capitalize' }}>{s}</MenuItem>
-                ))}
-              </TextField>
             </Grid>
             <Grid size={{ xs: 12 }}>
               <TextField label="Address" value={form.address} onChange={set('address')} fullWidth size="small" multiline rows={2} />
@@ -118,28 +97,22 @@ function ClientModal({ open, onClose, onSaved, initial }) {
           <Typography variant="overline" color="text.secondary">Vehicle Info</Typography>
           <Grid container spacing={2} sx={{ mt: 0 }}>
             <Grid size={{ xs: 6 }}>
-              <TextField label="Vehicle Number" value={form.vehicleNumber} onChange={set('vehicleNumber')} required fullWidth size="small" />
+              <TextField label="Car Number" value={form.carNumber} onChange={set('carNumber')} required fullWidth size="small" placeholder="e.g. AB-1234" />
             </Grid>
             <Grid size={{ xs: 6 }}>
               <TextField
-                select label="Vehicle Type" value={form.vehicleType} onChange={set('vehicleType')} fullWidth size="small"
+                select label="Car Type" value={form.carType} onChange={set('carType')} fullWidth size="small"
               >
                 {VEHICLE_TYPES.map((t) => (
-                  <MenuItem key={t} value={t}>{t}</MenuItem>
+                  <MenuItem key={t} value={t} sx={{ textTransform: 'capitalize' }}>{t}</MenuItem>
                 ))}
               </TextField>
             </Grid>
-            <Grid size={{ xs: 4 }}>
-              <TextField label="Make" value={form.vehicleMake} onChange={set('vehicleMake')} fullWidth size="small" placeholder="e.g. Toyota" />
+            <Grid size={{ xs: 6 }}>
+              <TextField label="Model" value={form.carModel} onChange={set('carModel')} required fullWidth size="small" placeholder="e.g. Corolla" />
             </Grid>
-            <Grid size={{ xs: 4 }}>
-              <TextField label="Model" value={form.vehicleModel} onChange={set('vehicleModel')} fullWidth size="small" placeholder="e.g. Corolla" />
-            </Grid>
-            <Grid size={{ xs: 4 }}>
-              <TextField label="Color" value={form.vehicleColor} onChange={set('vehicleColor')} fullWidth size="small" />
-            </Grid>
-            <Grid size={{ xs: 12 }}>
-              <TextField label="Notes" value={form.notes} onChange={set('notes')} fullWidth size="small" multiline rows={2} placeholder="Optional notes…" />
+            <Grid size={{ xs: 6 }}>
+              <TextField label="Color" value={form.carColor} onChange={set('carColor')} required fullWidth size="small" />
             </Grid>
           </Grid>
         </DialogContent>
@@ -175,7 +148,7 @@ export default function Clients() {
     const q = search.trim().toLowerCase();
     if (!q) return clients;
     return clients.filter((c) =>
-      [c.firstName, c.lastName, c.email, c.phone, c.nic, c.vehicleNumber]
+      [c.name, c.email, c.phone, c.carNumber, c.carModel]
         .some((v) => String(v ?? '').toLowerCase().includes(q))
     );
   }, [clients, search]);
@@ -195,7 +168,7 @@ export default function Clients() {
   function handleSaved(data, mode) {
     setClients((prev) =>
       mode === 'edit'
-        ? prev.map((c) => (c.id === data.id ? data : c))
+        ? prev.map((c) => (c._id === data._id ? data : c))
         : [data, ...prev]
     );
   }
@@ -258,8 +231,8 @@ export default function Clients() {
                 <TableCell>Name</TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Phone</TableCell>
-                <TableCell>NIC</TableCell>
-                <TableCell>Vehicle</TableCell>
+                <TableCell>Car Number</TableCell>
+                <TableCell>Model</TableCell>
                 <TableCell>Type</TableCell>
                 <TableCell>Status</TableCell>
                 <TableCell>Registered</TableCell>
@@ -278,7 +251,7 @@ export default function Clients() {
                 </TableRow>
               ) : (
                 paginated.map((c, i) => (
-                  <TableRow key={c.id ?? i} hover sx={{ '&:last-child td': { border: 0 } }}>
+                  <TableRow key={c._id ?? i} hover sx={{ '&:last-child td': { border: 0 } }}>
                     <TableCell>
                       <Typography variant="caption" color="text.secondary">
                         {page * rowsPerPage + i + 1}
@@ -286,7 +259,7 @@ export default function Clients() {
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" fontWeight={700}>
-                        {[c.firstName, c.lastName].filter(Boolean).join(' ') || '—'}
+                        {c.name || '—'}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -296,18 +269,18 @@ export default function Clients() {
                       <Typography variant="body2">{c.phone ?? '—'}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" color="text.secondary">{c.nic ?? '—'}</Typography>
+                      <Typography variant="body2" color="text.secondary">{c.carNumber ?? '—'}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" fontWeight={600}>{c.vehicleNumber ?? '—'}</Typography>
+                      <Typography variant="body2" fontWeight={600}>{c.carModel ?? '—'}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" color="text.secondary">{c.vehicleType ?? '—'}</Typography>
+                      <Typography variant="body2" color="text.secondary">{c.carType ?? '—'}</Typography>
                     </TableCell>
                     <TableCell>
                       <Chip
-                        label={c.status ?? 'active'}
-                        color={STATUS_COLOR[c.status] ?? 'default'}
+                        label={c.isActive ? 'active' : 'inactive'}
+                        color={c.isActive ? 'success' : 'default'}
                         size="small"
                         sx={{ fontWeight: 700, fontSize: 11, textTransform: 'capitalize' }}
                       />

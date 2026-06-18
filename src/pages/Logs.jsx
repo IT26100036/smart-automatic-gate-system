@@ -10,9 +10,13 @@ import FileDownloadIcon from '@mui/icons-material/FileDownload';
 import ClearIcon from '@mui/icons-material/Clear';
 import api from '../api/axios';
 
-const STATUS_OPTIONS = ['All', 'entry', 'exit', 'active'];
+const STATUS_OPTIONS = ['All', 'active', 'completed'];
 
-const CHIP_COLOR = { entry: 'primary', exit: 'success', active: 'warning' };
+const CHIP_COLOR = { active: 'warning', completed: 'success' };
+
+function logType(log) {
+  return log.exitTime ? 'completed' : 'active';
+}
 
 function fmt(iso) {
   if (!iso) return '—';
@@ -30,22 +34,20 @@ function fmtDuration(entryTime, exitTime) {
 }
 
 function toCSV(rows) {
-  const headers = ['ID', 'Card ID', 'Car Number', 'Car Type', 'Slot', 'Type', 'Entry Time', 'Exit Time', 'Duration', 'Fee (Rs.)'];
+  const headers = ['ID', 'Card ID', 'Slot', 'Status', 'Entry Time', 'Exit Time', 'Duration', 'Amount Charged (Rs.)'];
   const escape = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
   const lines = [
     headers.join(','),
     ...rows.map((l) =>
       [
-        l.id,
+        l._id,
         l.cardId,
-        l.carNumber,
-        l.carType,
-        l.slot,
-        l.type,
-        l.entryTime ?? l.time,
+        l.slotNumber,
+        logType(l),
+        l.entryTime,
         l.exitTime,
-        fmtDuration(l.entryTime ?? l.time, l.exitTime),
-        l.fee ?? 0,
+        fmtDuration(l.entryTime, l.exitTime),
+        l.amountCharged ?? 0,
       ]
         .map(escape)
         .join(',')
@@ -89,10 +91,9 @@ export default function Logs() {
     const to = dateTo ? new Date(dateTo + 'T23:59:59') : null;
 
     return logs.filter((l) => {
-      if (q && !String(l.cardId ?? '').toLowerCase().includes(q) &&
-              !String(l.carNumber ?? '').toLowerCase().includes(q)) return false;
-      if (status !== 'All' && l.type !== status) return false;
-      const t = new Date(l.time ?? l.entryTime);
+      if (q && !String(l.cardId ?? '').toLowerCase().includes(q)) return false;
+      if (status !== 'All' && logType(l) !== status) return false;
+      const t = new Date(l.entryTime);
       if (from && t < from) return false;
       if (to && t > to) return false;
       return true;
@@ -207,14 +208,13 @@ export default function Logs() {
               <TableRow sx={{ '& th': { fontWeight: 700, bgcolor: 'action.hover', whiteSpace: 'nowrap' } }}>
                 <TableCell>#</TableCell>
                 <TableCell>Card ID</TableCell>
-                <TableCell>Car Number</TableCell>
-                <TableCell>Car Type</TableCell>
+                <TableCell>Client</TableCell>
                 <TableCell>Slot</TableCell>
-                <TableCell>Type</TableCell>
+                <TableCell>Status</TableCell>
                 <TableCell>Entry Time</TableCell>
                 <TableCell>Exit Time</TableCell>
                 <TableCell>Duration</TableCell>
-                <TableCell align="right">Fee (Rs.)</TableCell>
+                <TableCell align="right">Amount (Rs.)</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -225,61 +225,59 @@ export default function Logs() {
                   </TableCell>
                 </TableRow>
               ) : (
-                paginated.map((log, i) => (
-                  <TableRow key={log.id ?? i} hover sx={{ '&:last-child td': { border: 0 } }}>
-                    <TableCell>
-                      <Typography variant="caption" color="text.secondary">
-                        {page * rowsPerPage + i + 1}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight={600}>
-                        {log.cardId ?? '—'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" fontWeight={700}>
-                        {log.carNumber ?? '—'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" color="text.secondary">
-                        {log.carType ?? '—'}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">{log.slot ?? '—'}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={log.type ?? '—'}
-                        color={CHIP_COLOR[log.type] ?? 'default'}
-                        size="small"
-                        sx={{ fontWeight: 700, fontSize: 11, textTransform: 'capitalize' }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
-                        {fmt(log.entryTime ?? log.time)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
-                        {fmt(log.exitTime)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">
-                        {fmtDuration(log.entryTime ?? log.time, log.exitTime)}
-                      </Typography>
-                    </TableCell>
-                    <TableCell align="right">
-                      <Typography variant="body2" fontWeight={700} color="primary.main">
-                        {log.fee != null ? `${Number(log.fee).toFixed(2)}` : '—'}
-                      </Typography>
-                    </TableCell>
-                  </TableRow>
-                ))
+                paginated.map((log, i) => {
+                  const type = logType(log);
+                  return (
+                    <TableRow key={log._id ?? i} hover sx={{ '&:last-child td': { border: 0 } }}>
+                      <TableCell>
+                        <Typography variant="caption" color="text.secondary">
+                          {page * rowsPerPage + i + 1}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" fontWeight={600}>
+                          {log.cardId ?? '—'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {log.clientId?.name ?? '—'}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">{log.slotNumber ?? '—'}</Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Chip
+                          label={type}
+                          color={CHIP_COLOR[type] ?? 'default'}
+                          size="small"
+                          sx={{ fontWeight: 700, fontSize: 11, textTransform: 'capitalize' }}
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
+                          {fmt(log.entryTime)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2" sx={{ whiteSpace: 'nowrap' }}>
+                          {fmt(log.exitTime)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell>
+                        <Typography variant="body2">
+                          {fmtDuration(log.entryTime, log.exitTime)}
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="right">
+                        <Typography variant="body2" fontWeight={700} color="primary.main">
+                          {log.amountCharged != null ? Number(log.amountCharged).toFixed(2) : '—'}
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </TableBody>
           </Table>

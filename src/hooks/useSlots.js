@@ -9,7 +9,17 @@ export default function useSlots() {
   const fetchSlots = useCallback(async () => {
     try {
       const { data } = await api.get('/api/parking/slots');
-      setSlots(data);
+      const normalized = data.map((s) => ({
+        id: s._id,
+        label: `Slot ${s.slotNumber}`,
+        slotNumber: s.slotNumber,
+        status: s.isOccupied ? 'occupied' : 'free',
+        isOccupied: s.isOccupied,
+        cardId: s.cardId ?? null,
+        carNumber: s.carNumber ?? null,
+        entryTime: s.entryTime ?? null,
+      }));
+      setSlots(normalized);
       setLastUpdated(new Date());
     } catch {
       // keep stale data on error
