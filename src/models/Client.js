@@ -6,7 +6,7 @@ const clientSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true },
     address: { type: String, default: null },
-    cardId: { type: String, ref: "Card", default: null },
+    cardId: { type: mongoose.Schema.Types.ObjectId, ref: "Card", default: null },
     carNumber: { type: String, required: true, unique: true },
     carType: {
       type: String,

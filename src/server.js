@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 const connectDB = require("./config/database");
 const errorHandler = require("./middleware/errorHandler");
 const seedSlots = require("./config/seedSlots");
-const { globalLimiter, authLimiter } = require("./middleware/rateLimiter");
+const { globalLimiter } = require("./middleware/rateLimiter");
 
 const authRoutes = require("./routes/authRoutes");
 const clientRoutes = require("./routes/clientRoutes");
@@ -30,13 +30,14 @@ app.get("/health", async (req, res) => {
   });
 });
 
-app.use("/api/auth", authLimiter, authRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/cards", cardRoutes);
 app.use("/api/parking", parkingRoutes);
 
 app.use(errorHandler);
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });

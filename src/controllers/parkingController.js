@@ -47,15 +47,13 @@ const handleEntry = async (req, res) => {
       return res.status(403).json({ message: "Insufficient balance" });
     }
 
-    const alreadyParked = await ParkingSlot.findOne({ cardId });
-    if (alreadyParked) {
-      return res
-        .status(400)
-        .json({ message: "Card already has an active slot" });
+    const activeSession = await ParkingLog.findOne({ cardId, exitTime: null });
+    if (activeSession) {
+      return res.status(400).json({ message: "Card already has an active parking session" });
     }
 
     const availableSlot = await ParkingSlot.findOneAndUpdate(
-      { isOccupied: false },
+      { isOccupied: false, cardId: null },
       { isOccupied: true, cardId, carNumber: card.clientId.carNumber },
       { new: true },
     );
@@ -119,6 +117,9 @@ const handleExit = async (req, res) => {
     await log.save();
 
     const slot = await ParkingSlot.findOne({ slotNumber: log.slotNumber });
+    if (!slot) {
+      return res.status(404).json({ message: "Parking slot not found" });
+    }
     slot.isOccupied = false;
     slot.cardId = null;
     slot.carNumber = null;

@@ -82,10 +82,16 @@ const updateClient = async (req, res) => {
       return res.status(404).json({ message: "Client not found" });
     }
 
+    const { name, email, phone, address, carNumber, carType, carModel, carColor } = req.body;
+
+    if (carNumber && !CAR_NUMBER_REGEX.test(carNumber)) {
+      return res.status(400).json({ message: "carNumber must follow the format AB-1234 or ABC-1234" });
+    }
+
     const updatedClient = await Client.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      { new: true },
+      { name, email, phone, address, carNumber, carType, carModel, carColor },
+      { new: true, runValidators: true },
     );
 
     res.status(200).json(updatedClient);

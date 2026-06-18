@@ -49,7 +49,7 @@ const createCard = async (req, res) => {
 
     const card = await Card.create({ cardId, clientId, balance });
 
-    await Client.findByIdAndUpdate(clientId, { cardId });
+    await Client.findByIdAndUpdate(clientId, { cardId: card._id });
 
     res.status(201).json(card);
   } catch (error) {
@@ -62,6 +62,10 @@ const createCard = async (req, res) => {
 const topUpCard = async (req, res) => {
   try {
     const { amount } = req.body;
+
+    if (!amount || typeof amount !== "number" || amount <= 0) {
+      return res.status(400).json({ message: "Amount must be a positive number" });
+    }
 
     const card = await Card.findOne({ cardId: req.params.cardId });
     if (!card) {
