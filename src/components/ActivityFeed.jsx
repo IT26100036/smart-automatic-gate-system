@@ -38,7 +38,7 @@ function EventItem({ log, showDivider }) {
           primary={
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Typography variant="body2" fontWeight={700}>
-                {log.carNumber ?? '—'}
+                {log.carNumber ?? '-'}
               </Typography>
               <Typography variant="caption" color="text.secondary">
                 {formatTime(log.entryTime)}
@@ -47,7 +47,7 @@ function EventItem({ log, showDivider }) {
           }
           secondary={
             <Typography variant="caption" color={isEntry ? 'primary.main' : 'success.main'} fontWeight={600}>
-              {isEntry ? `Entry · Slot ${log.slotNumber ?? '—'}` : `Exit · Slot ${log.slotNumber ?? '—'}`}
+              {isEntry ? `Entry · Slot ${log.slotNumber ?? '-'}` : `Exit · Slot ${log.slotNumber ?? '-'}`}
             </Typography>
           }
           sx={{ my: 0 }}

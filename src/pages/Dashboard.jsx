@@ -133,7 +133,7 @@ export default function Dashboard() {
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-      {/* Stat cards — 4 in a row from md up, 2 on small */}
+      {/* Stat cards - 4 in a row from md up, 2 on small */}
       <Grid container spacing={2}>
         <Grid size={{ xs: 6, md: 3 }}>
           <StatCard label="Total Slots" value={total} icon={<ViewModuleIcon />} />
@@ -167,7 +167,7 @@ export default function Dashboard() {
       {/* Chart + Activity feed */}
       <Grid container spacing={3}>
         <Grid size={{ xs: 12, md: 8 }} sx={{ display: 'flex', flexDirection: 'column' }}>
-          <SectionTitle>Revenue — Last 7 Days</SectionTitle>
+          <SectionTitle>Revenue - Last 7 Days</SectionTitle>
           <Card variant="outlined" sx={{ flex: 1 }}>
             <CardContent sx={{ height: 280, pt: 3 }}>
               <Bar data={chartData} options={CHART_OPTIONS} />

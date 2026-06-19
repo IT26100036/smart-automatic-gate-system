@@ -4,11 +4,12 @@ import {
   Table, TableHead, TableBody, TableRow, TableCell, TableContainer,
   TablePagination, IconButton, Tooltip, InputAdornment, Button,
   Dialog, DialogTitle, DialogContent, DialogActions,
-  MenuItem, Chip, Grid, Alert,
+  MenuItem, Chip, Grid, Alert, Divider,
 } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 import ClearIcon from '@mui/icons-material/Clear';
 import PersonIcon from '@mui/icons-material/Person';
 import api from '../api/axios';
@@ -29,7 +30,7 @@ const EMPTY_FORM = {
 };
 
 function fmt(iso) {
-  if (!iso) return '—';
+  if (!iso) return '-';
   return new Date(iso).toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
 }
 
@@ -128,6 +129,118 @@ function ClientModal({ open, onClose, onSaved, initial }) {
   );
 }
 
+/* ── Delete confirmation dialog ── */
+function DeleteDialog({ open, onClose, client, onDeleted }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => { if (open) setError(''); }, [open]);
+
+  async function handleConfirm() {
+    setLoading(true);
+    try {
+      await api.delete(`/api/clients/${client._id}`);
+      onDeleted(client._id);
+      onClose();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Delete failed.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+      <DialogTitle sx={{ fontWeight: 700 }}>Delete Client</DialogTitle>
+      <DialogContent sx={{ pt: 1 }}>
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        <Typography variant="body2">
+          Are you sure you want to delete <strong>{client?.name}</strong>? This cannot be undone.
+        </Typography>
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 2.5 }}>
+        <Button onClick={onClose} disabled={loading}>Cancel</Button>
+        <Button variant="contained" color="error" onClick={handleConfirm} disabled={loading}>
+          {loading ? 'Deleting…' : 'Delete'}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
+/* ── Client detail modal ── */
+function ClientDetailModal({ open, onClose, clientId }) {
+  const [detail, setDetail] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!open || !clientId) return;
+    setLoading(true);
+    api.get(`/api/clients/${clientId}/card`)
+      .then(({ data }) => setDetail(data))
+      .catch(() => setDetail(null))
+      .finally(() => setLoading(false));
+  }, [open, clientId]);
+
+  const card = detail?.card;
+
+  return (
+    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle sx={{ fontWeight: 700 }}>Client Details</DialogTitle>
+      <DialogContent sx={{ pt: 1 }}>
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+            <CircularProgress size={28} color="primary" />
+          </Box>
+        ) : detail ? (
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Grid container spacing={2}>
+              {[
+                { label: 'Name', value: detail.name },
+                { label: 'Email', value: detail.email },
+                { label: 'Phone', value: detail.phone },
+                { label: 'Address', value: detail.address || '-' },
+                { label: 'Car Number', value: detail.carNumber },
+                { label: 'Car Type', value: detail.carType },
+                { label: 'Car Model', value: detail.carModel },
+                { label: 'Car Color', value: detail.carColor },
+              ].map(({ label, value }) => (
+                <Grid size={{ xs: 6 }} key={label}>
+                  <Typography variant="caption" color="text.secondary">{label}</Typography>
+                  <Typography variant="body2" fontWeight={600}>{value ?? '-'}</Typography>
+                </Grid>
+              ))}
+            </Grid>
+            <Divider />
+            <Typography variant="subtitle2" fontWeight={700}>Linked Card</Typography>
+            {card ? (
+              <Grid container spacing={2}>
+                {[
+                  { label: 'Card ID', value: card.cardId },
+                  { label: 'Balance', value: `Rs. ${Number(card.balance ?? 0).toFixed(2)}` },
+                  { label: 'Status', value: card.isActive ? 'Active' : 'Inactive' },
+                ].map(({ label, value }) => (
+                  <Grid size={{ xs: 6 }} key={label}>
+                    <Typography variant="caption" color="text.secondary">{label}</Typography>
+                    <Typography variant="body2" fontWeight={600}>{value}</Typography>
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              <Typography variant="body2" color="text.secondary">No card linked to this client.</Typography>
+            )}
+          </Box>
+        ) : (
+          <Typography variant="body2" color="error">Failed to load client details.</Typography>
+        )}
+      </DialogContent>
+      <DialogActions sx={{ px: 3, pb: 2.5 }}>
+        <Button onClick={onClose}>Close</Button>
+      </DialogActions>
+    </Dialog>
+  );
+}
+
 export default function Clients() {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -136,6 +249,8 @@ export default function Clients() {
   const [rowsPerPage, setRowsPerPage] = useState(25);
   const [modalOpen, setModalOpen] = useState(false);
   const [editTarget, setEditTarget] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [detailId, setDetailId] = useState(null);
 
   useEffect(() => {
     api.get('/api/clients')
@@ -171,6 +286,10 @@ export default function Clients() {
         ? prev.map((c) => (c._id === data._id ? data : c))
         : [data, ...prev]
     );
+  }
+
+  function handleDeleted(id) {
+    setClients((prev) => prev.filter((c) => c._id !== id));
   }
 
   if (loading) {
@@ -259,23 +378,23 @@ export default function Clients() {
                     </TableCell>
                     <TableCell>
                       <Typography variant="body2" fontWeight={700}>
-                        {c.name || '—'}
+                        {c.name || '-'}
                       </Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2">{c.email ?? '—'}</Typography>
+                      <Typography variant="body2">{c.email ?? '-'}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2">{c.phone ?? '—'}</Typography>
+                      <Typography variant="body2">{c.phone ?? '-'}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" color="text.secondary">{c.carNumber ?? '—'}</Typography>
+                      <Typography variant="body2" color="text.secondary">{c.carNumber ?? '-'}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" fontWeight={600}>{c.carModel ?? '—'}</Typography>
+                      <Typography variant="body2" fontWeight={600}>{c.carModel ?? '-'}</Typography>
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2" color="text.secondary">{c.carType ?? '—'}</Typography>
+                      <Typography variant="body2" color="text.secondary">{c.carType ?? '-'}</Typography>
                     </TableCell>
                     <TableCell>
                       <Chip
@@ -291,11 +410,23 @@ export default function Clients() {
                       </Typography>
                     </TableCell>
                     <TableCell align="center">
-                      <Tooltip title="Edit">
-                        <IconButton size="small" onClick={() => openEdit(c)}>
-                          <EditIcon fontSize="small" />
-                        </IconButton>
-                      </Tooltip>
+                      <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'center' }}>
+                        <Tooltip title="View Details">
+                          <IconButton size="small" onClick={() => setDetailId(c._id)}>
+                            <PersonIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Edit">
+                          <IconButton size="small" onClick={() => openEdit(c)}>
+                            <EditIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                        <Tooltip title="Delete">
+                          <IconButton size="small" color="error" onClick={() => setDeleteTarget(c)}>
+                            <DeleteIcon fontSize="small" />
+                          </IconButton>
+                        </Tooltip>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))
@@ -320,6 +451,19 @@ export default function Clients() {
         onClose={() => setModalOpen(false)}
         onSaved={handleSaved}
         initial={editTarget}
+      />
+
+      <DeleteDialog
+        open={Boolean(deleteTarget)}
+        onClose={() => setDeleteTarget(null)}
+        client={deleteTarget}
+        onDeleted={handleDeleted}
+      />
+
+      <ClientDetailModal
+        open={Boolean(detailId)}
+        onClose={() => setDetailId(null)}
+        clientId={detailId}
       />
     </Box>
   );

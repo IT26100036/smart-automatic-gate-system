@@ -23,7 +23,7 @@ const NAV_META = {
 };
 
 const MOCK_NOTIFICATIONS = [
-  { id: 1, icon: 'solar:car-bold-duotone',    color: '#f97316', text: 'New vehicle entry — Slot A2', time: '2 min ago' },
+  { id: 1, icon: 'solar:car-bold-duotone',    color: '#f97316', text: 'New vehicle entry - Slot A2', time: '2 min ago' },
   { id: 2, icon: 'solar:card-bold-duotone',   color: '#1877F2', text: 'Card #A7D02349 activated',    time: '15 min ago' },
   { id: 3, icon: 'solar:bell-bold-duotone',   color: '#10b981', text: 'Daily revenue target reached', time: '1 hr ago' },
   { id: 4, icon: 'solar:user-bold-duotone',   color: '#8b5cf6', text: 'New client registered',       time: '3 hr ago' },

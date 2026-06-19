@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Box, Card, CardContent, Typography, Table, TableHead,
   TableBody, TableRow, TableCell, TableContainer,
-  Chip, CircularProgress,
+  Chip, CircularProgress, Tooltip, IconButton,
 } from '@mui/material';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 import useSlots from '../hooks/useSlots';
 import SlotGrid from '../components/SlotGrid';
 import useLiveTime from '../hooks/useLiveTime';
@@ -17,7 +18,7 @@ function calcCharge(entryTime, now) {
 }
 
 function formatDuration(entryTime, now) {
-  if (!entryTime) return '—';
+  if (!entryTime) return '-';
   const totalSec = Math.floor((now - new Date(entryTime)) / 1000);
   const h = Math.floor(totalSec / 3600);
   const m = Math.floor((totalSec % 3600) / 60);
@@ -28,8 +29,18 @@ function formatDuration(entryTime, now) {
 }
 
 export default function Slots() {
-  const { slots, loading, lastUpdated } = useSlots();
+  const { slots, loading, lastUpdated, updateSlot } = useSlots();
   const now = useLiveTime();
+  const [clearing, setClearing] = useState(null);
+
+  async function handleClear(slotNumber) {
+    setClearing(slotNumber);
+    try {
+      await updateSlot(slotNumber, false);
+    } finally {
+      setClearing(null);
+    }
+  }
 
   const occupants = useMemo(
     () => slots.filter((s) => s.status === 'occupied'),
@@ -86,6 +97,7 @@ export default function Slots() {
                     <TableCell>Duration</TableCell>
                     <TableCell align="right">Est. Charge</TableCell>
                     <TableCell align="center">Status</TableCell>
+                    <TableCell align="center">Override</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -104,7 +116,7 @@ export default function Slots() {
                         </TableCell>
                         <TableCell>
                           <Typography variant="body2" fontWeight={600}>
-                            {slot.carNumber ?? '—'}
+                            {slot.carNumber ?? '-'}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -114,7 +126,7 @@ export default function Slots() {
                                   hour: '2-digit',
                                   minute: '2-digit',
                                 })
-                              : '—'}
+                              : '-'}
                           </Typography>
                         </TableCell>
                         <TableCell>
@@ -129,11 +141,25 @@ export default function Slots() {
                             color="primary.main"
                             sx={{ fontVariantNumeric: 'tabular-nums' }}
                           >
-                            {charge != null ? `Rs. ${charge.toFixed(2)}` : '—'}
+                            {charge != null ? `Rs. ${charge.toFixed(2)}` : '-'}
                           </Typography>
                         </TableCell>
                         <TableCell align="center">
                           <Chip label="Occupied" color="error" size="small" sx={{ fontWeight: 700, fontSize: 11 }} />
+                        </TableCell>
+                        <TableCell align="center">
+                          <Tooltip title="Force clear slot">
+                            <span>
+                              <IconButton
+                                size="small"
+                                color="warning"
+                                disabled={clearing === slot.slotNumber}
+                                onClick={() => handleClear(slot.slotNumber)}
+                              >
+                                <LockOpenIcon fontSize="small" />
+                              </IconButton>
+                            </span>
+                          </Tooltip>
                         </TableCell>
                       </TableRow>
                     );

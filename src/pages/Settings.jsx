@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import {
   Box, Grid, Card, CardContent, Typography, TextField,
-  Button, Alert, Divider, CircularProgress, Chip,
+  Button, Alert, Divider, CircularProgress, Chip, MenuItem,
 } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import MonitorHeartIcon from '@mui/icons-material/MonitorHeart';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
 
@@ -58,7 +59,7 @@ function SectionHeader({ icon, title, subtitle }) {
 
 /* ── Account form ── */
 function AccountForm() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
 
   const [form, setForm] = useState({
     name: user?.name ?? '',
@@ -96,11 +97,12 @@ function AccountForm() {
 
     setSaving(true);
     try {
-      await api.put('/api/auth/profile', payload);
+      const { data } = await api.put('/api/auth/profile', payload);
+      updateUser({ name: data.name, email: data.email });
       setFeedback({ type: 'success', msg: 'Account updated successfully.' });
       setForm((f) => ({ ...f, currentPassword: '', newPassword: '', confirmPassword: '' }));
     } catch (err) {
-      setFeedback({ type: 'error', msg: err.response?.data?.message || 'Update failed. (Profile update endpoint not yet implemented on the backend.)' });
+      setFeedback({ type: 'error', msg: err.response?.data?.message || 'Update failed.' });
     } finally {
       setSaving(false);
     }
@@ -228,7 +230,7 @@ function SystemStatus() {
   const uptime = health?.uptime;
 
   function fmtUptime(seconds) {
-    if (!seconds) return '—';
+    if (!seconds) return '-';
     const d = Math.floor(seconds / 86400);
     const h = Math.floor((seconds % 86400) / 3600);
     const m = Math.floor((seconds % 3600) / 60);
@@ -314,6 +316,77 @@ function SystemStatus() {
   );
 }
 
+/* ── Create user form ── */
+const EMPTY_USER = { name: '', email: '', password: '', role: 'staff' };
+
+function CreateUserForm() {
+  const { user } = useAuth();
+  const [form, setForm] = useState(EMPTY_USER);
+  const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState(null);
+
+  if (user?.role !== 'admin') return null;
+
+  function set(field) {
+    return (e) => { setForm((f) => ({ ...f, [field]: e.target.value })); setFeedback(null); };
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (form.password.length < 8) {
+      setFeedback({ type: 'error', msg: 'Password must be at least 8 characters.' });
+      return;
+    }
+    setSaving(true);
+    try {
+      await api.post('/api/auth/register', form);
+      setFeedback({ type: 'success', msg: `User "${form.name}" created successfully.` });
+      setForm(EMPTY_USER);
+    } catch (err) {
+      setFeedback({ type: 'error', msg: err.response?.data?.message || 'Failed to create user.' });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Card variant="outlined">
+      <CardContent sx={{ p: 3 }}>
+        <SectionHeader
+          icon={<PersonAddIcon fontSize="small" />}
+          title="Create Staff / Admin Account"
+          subtitle="Add a new user who can log in to this dashboard"
+        />
+        <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+          {feedback && <Alert severity={feedback.type}>{feedback.msg}</Alert>}
+          <Grid container spacing={2}>
+            <Grid item xs={12} sm={6}>
+              <TextField label="Full Name" value={form.name} onChange={set('name')} required fullWidth size="small" />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField label="Email Address" type="email" value={form.email} onChange={set('email')} required fullWidth size="small" />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField label="Password" type="password" value={form.password} onChange={set('password')} required fullWidth size="small" autoComplete="new-password" />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField select label="Role" value={form.role} onChange={set('role')} fullWidth size="small">
+                <MenuItem value="staff">Staff</MenuItem>
+                <MenuItem value="admin">Admin</MenuItem>
+              </TextField>
+            </Grid>
+          </Grid>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <Button type="submit" variant="contained" disabled={saving} sx={{ minWidth: 160 }}>
+              {saving ? 'Creating…' : 'Create Account'}
+            </Button>
+          </Box>
+        </Box>
+      </CardContent>
+    </Card>
+  );
+}
+
 /* ── Page ── */
 export default function Settings() {
   return (
@@ -326,6 +399,7 @@ export default function Settings() {
       </Box>
 
       <AccountForm />
+      <CreateUserForm />
       <SystemStatus />
     </Box>
   );

@@ -44,7 +44,7 @@ function SlotCard({ slot }) {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.75 }}>
               <DirectionsCarIcon fontSize="small" color="error" />
               <Typography variant="body2" fontWeight={700}>
-                {slot.carNumber ?? '—'}
+                {slot.carNumber ?? '-'}
               </Typography>
             </Box>
             {slot.entryTime && (

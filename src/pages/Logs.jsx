@@ -19,7 +19,7 @@ function logType(log) {
 }
 
 function fmt(iso) {
-  if (!iso) return '—';
+  if (!iso) return '-';
   return new Date(iso).toLocaleString([], {
     month: 'short', day: 'numeric',
     hour: '2-digit', minute: '2-digit',
@@ -27,7 +27,7 @@ function fmt(iso) {
 }
 
 function fmtDuration(entryTime, exitTime) {
-  if (!entryTime || !exitTime) return '—';
+  if (!entryTime || !exitTime) return '-';
   const mins = Math.round((new Date(exitTime) - new Date(entryTime)) / 60000);
   if (mins < 60) return `${mins}m`;
   return `${Math.floor(mins / 60)}h ${mins % 60}m`;
@@ -236,16 +236,16 @@ export default function Logs() {
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2" fontWeight={600}>
-                          {log.cardId ?? '—'}
+                          {log.cardId ?? '-'}
                         </Typography>
                       </TableCell>
                       <TableCell>
                         <Typography variant="body2">
-                          {log.clientId?.name ?? '—'}
+                          {log.clientId?.name ?? '-'}
                         </Typography>
                       </TableCell>
                       <TableCell>
-                        <Typography variant="body2">{log.slotNumber ?? '—'}</Typography>
+                        <Typography variant="body2">{log.slotNumber ?? '-'}</Typography>
                       </TableCell>
                       <TableCell>
                         <Chip
@@ -272,7 +272,7 @@ export default function Logs() {
                       </TableCell>
                       <TableCell align="right">
                         <Typography variant="body2" fontWeight={700} color="primary.main">
-                          {log.amountCharged != null ? Number(log.amountCharged).toFixed(2) : '—'}
+                          {log.amountCharged != null ? Number(log.amountCharged).toFixed(2) : '-'}
                         </Typography>
                       </TableCell>
                     </TableRow>

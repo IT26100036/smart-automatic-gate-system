@@ -81,7 +81,7 @@ function buildDayBuckets(days, logs, field) {
   return days.map((day) =>
     logs
       .filter((l) => {
-        const d = new Date(l.time ?? l.entryTime);
+        const d = new Date(l.entryTime);
         return (
           d.getFullYear() === day.getFullYear() &&
           d.getMonth() === day.getMonth() &&
@@ -95,7 +95,7 @@ function buildDayBuckets(days, logs, field) {
 function buildHourBuckets(logs) {
   const buckets = Array(24).fill(0);
   logs.forEach((l) => {
-    const h = new Date(l.entryTime ?? l.time).getHours();
+    const h = new Date(l.entryTime).getHours();
     if (!isNaN(h)) buckets[h]++;
   });
   return buckets;
@@ -128,7 +128,7 @@ export default function Analytics() {
 
   const filtered = useMemo(() => {
     const cutoff = daysAgo(range);
-    return logs.filter((l) => new Date(l.time ?? l.entryTime) >= cutoff);
+    return logs.filter((l) => new Date(l.entryTime) >= cutoff);
   }, [logs, range]);
 
   const days = useMemo(
@@ -142,8 +142,8 @@ export default function Analytics() {
   );
 
   const stats = useMemo(() => {
-    const totalRevenue = filtered.reduce((s, l) => s + (l.fee ?? 0), 0);
-    const totalEntries = filtered.filter((l) => l.type === 'entry').length || filtered.length;
+    const totalRevenue = filtered.reduce((s, l) => s + (l.amountCharged ?? 0), 0);
+    const totalEntries = filtered.filter((l) => !l.exitTime).length || filtered.length;
     const durations = filtered
       .filter((l) => l.entryTime && l.exitTime)
       .map((l) => (new Date(l.exitTime) - new Date(l.entryTime)) / 60000);
@@ -157,7 +157,7 @@ export default function Analytics() {
   const dailyRevenue = useMemo(() => ({
     labels: days.map(dateLabel),
     datasets: [{
-      data: buildDayBuckets(days, filtered, 'fee'),
+      data: buildDayBuckets(days, filtered, 'amountCharged'),
       borderColor: ORANGE_SOLID,
       backgroundColor: ORANGE_LIGHT,
       fill: true,
@@ -168,9 +168,9 @@ export default function Analytics() {
   const dailyEntries = useMemo(() => ({
     labels: days.map(dateLabel),
     datasets: [{
-      data: buildDayBuckets(days, filtered, 'fee').map((_, i) =>
+      data: buildDayBuckets(days, filtered, 'amountCharged').map((_, i) =>
         filtered.filter((l) => {
-          const d = new Date(l.time ?? l.entryTime);
+          const d = new Date(l.entryTime);
           return (
             d.getFullYear() === days[i].getFullYear() &&
             d.getMonth() === days[i].getMonth() &&
