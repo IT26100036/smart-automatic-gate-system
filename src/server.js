@@ -5,7 +5,6 @@ const mongoose = require("mongoose");
 const connectDB = require("./config/database");
 const errorHandler = require("./middleware/errorHandler");
 const seedSlots = require("./config/seedSlots");
-const { globalLimiter } = require("./middleware/rateLimiter");
 
 const authRoutes = require("./routes/authRoutes");
 const clientRoutes = require("./routes/clientRoutes");
@@ -18,7 +17,6 @@ connectDB().then(() => seedSlots());
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(globalLimiter);
 app.set("trust proxy", 1);
 
 app.get("/", (req, res) => res.send("Smart Gate API Running"));
