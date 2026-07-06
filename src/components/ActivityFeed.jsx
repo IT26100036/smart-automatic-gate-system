@@ -38,10 +38,10 @@ function EventItem({ log, showDivider }) {
           primary={
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <Typography variant="body2" fontWeight={700}>
-                {log.carNumber ?? '-'}
+                {log.carNumber ?? log.clientId?.carNumber ?? '-'}
               </Typography>
               <Typography variant="caption" color="text.secondary">
-                {formatTime(log.entryTime)}
+                {formatTime(isEntry ? log.entryTime : log.exitTime)}
               </Typography>
             </Box>
           }
