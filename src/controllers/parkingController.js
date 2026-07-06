@@ -100,7 +100,7 @@ const handleExit = async (req, res) => {
     const exitTime = new Date();
     const durationMs = exitTime - log.entryTime;
     const durationMinutes = Math.ceil(durationMs / 60000);
-    const ratePerMinute = 0.5;
+    const ratePerMinute = 2.5; // LKR 150 per hour
     const amountCharged = durationMinutes * ratePerMinute;
 
     if (card.balance < amountCharged) {
