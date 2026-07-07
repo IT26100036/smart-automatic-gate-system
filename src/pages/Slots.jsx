@@ -9,11 +9,13 @@ import useSlots from '../hooks/useSlots';
 import SlotGrid from '../components/SlotGrid';
 import useLiveTime from '../hooks/useLiveTime';
 
-const RATE_PER_MIN = 0.5; // Rs. per minute
+const RATE_PER_MIN = 2.5; // Rs. per minute (LKR 150/hr, must match backend)
 
+// Mirror the backend billing: minutes are rounded UP, so the estimate
+// always matches what handleExit will actually charge.
 function calcCharge(entryTime, now) {
   if (!entryTime) return null;
-  const mins = (now - new Date(entryTime)) / 60000;
+  const mins = Math.ceil((now - new Date(entryTime)) / 60000);
   return Math.max(0, mins * RATE_PER_MIN);
 }
 
