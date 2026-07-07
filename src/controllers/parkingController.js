@@ -20,7 +20,9 @@ const updateSlotStatus = async (req, res) => {
     const { isOccupied } = req.body;
     const slot = await ParkingSlot.findOneAndUpdate(
       { slotNumber: req.params.slotNumber },
-      { isOccupied },
+      isOccupied
+        ? { isOccupied }
+        : { isOccupied, cardId: null, carNumber: null, entryTime: null },
       { new: true },
     );
     if (!slot) return res.status(404).json({ message: "Slot not found" });
@@ -54,7 +56,7 @@ const handleEntry = async (req, res) => {
 
     const availableSlot = await ParkingSlot.findOneAndUpdate(
       { isOccupied: false, cardId: null },
-      { isOccupied: true, cardId, carNumber: card.clientId.carNumber },
+      { isOccupied: true, cardId, carNumber: card.clientId.carNumber, entryTime: new Date() },
       { new: true },
     );
 
@@ -123,6 +125,7 @@ const handleExit = async (req, res) => {
     slot.isOccupied = false;
     slot.cardId = null;
     slot.carNumber = null;
+    slot.entryTime = null;
     await slot.save();
 
     res.status(200).json({
